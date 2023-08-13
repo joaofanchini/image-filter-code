@@ -1,8 +1,8 @@
 import express from 'express';
 import { Query } from 'express-serve-static-core';
 import bodyParser from 'body-parser';
-
 import * as core from 'express-serve-static-core';
+
 import { filterImageFromURL, deleteLocalFiles } from './util/util';
 
 (async () => {
@@ -38,6 +38,11 @@ import { filterImageFromURL, deleteLocalFiles } from './util/util';
     query: T,
   }
 
+  const enum HttpStatus {
+    OK = 200,
+    BAD_REQUEST = 400
+  }
+
   // Root Endpoint
   // Displays a simple message to the user
   app.get("/", async (req: express.Request, res: express.Response): Promise<void> => {
@@ -48,17 +53,18 @@ import { filterImageFromURL, deleteLocalFiles } from './util/util';
     const imageUrl: string = req.query.image_url;
 
     if (!imageUrl || imageUrl.length === 0) {
-      res.status(400)
-        .json({ 'error': 'Required parameter "image_url' })
+      res.status(HttpStatus.BAD_REQUEST)
+        .send('Required parameter "image_url')
         .end();
+
       return;
     }
 
     const filterImage: string = await filterImageFromURL(imageUrl);
 
-    req.on('close', () => deleteLocalFiles([filterImage]));
+    req.on('close', (): Promise<void> => deleteLocalFiles([filterImage]));
 
-    res.status(200)
+    res.status(HttpStatus.OK)
       .sendFile(filterImage);
   });
 
