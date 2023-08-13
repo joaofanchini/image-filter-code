@@ -54,7 +54,7 @@ import { filterImageFromURL, deleteLocalFiles } from './util/util';
       return;
     }
 
-    const filterImage = await filterImageFromURL(imageUrl);
+    const filterImage: string = await filterImageFromURL(imageUrl);
 
     req.on('close', () => deleteLocalFiles([filterImage]));
 
